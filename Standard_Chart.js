@@ -1,4 +1,4 @@
-
+function($){
 /*
 This formats all the JSON data from shadow priest sims into charts.
 */
@@ -282,3 +282,4 @@ createTrinketChart("https://raw.githubusercontent.com/WarcraftPriests/bfa-shadow
 
 //standard_chart.destroy();
 });
+};
