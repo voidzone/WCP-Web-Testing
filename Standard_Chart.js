@@ -12,6 +12,58 @@ const medium_color = "#999999";
 const dark_color = "#343a40";
 		
 $(function () { 
+    /*
+<div class="tab">
+<button class="tablinks" onclick="openCity(event, 'London')">London</button>
+<button class="tablinks" onclick="openCity(event, 'Paris')">Paris</button>
+<button class="tablinks" onclick="openCity(event, 'Tokyo')">Tokyo</button>
+</div>
+
+<!-- Tab content -->
+<div id="London" class="tabcontent">
+<h3>London</h3>
+<p>London is the capital city of England.</p>
+</div>
+
+<div id="Paris" class="tabcontent">
+<h3>Paris</h3>
+<p>Paris is the capital of France.</p> 
+</div>
+
+<div id="Tokyo" class="tabcontent">
+<h3>Tokyo</h3>
+<p>Tokyo is the capital of Japan.</p>
+</div>
+    */
+
+    //Create all the HTML for the elements for the charts.
+    var chartDiv = document.createElement("div");
+    chartDiv.setAttribute("id", "chart-div");
+    chartDiv.setAttribute("class","tab");
+    var DABtn = document.createElement("BUTTON");
+    DABtn.setAttribute("id", "defaultOpen");
+    var DAText = document.createTextNode("Dark Ascension");
+    DABtn.appendChild(DAText);
+    document.body.appendChild(chartDiv);
+    chartDiv.appendChild(DABtn)
+
+    //DA div's
+    var DATrinket = document.createElement("div");
+    DATrinket.setAttribute("id", "DA-Trinket-div");
+    DATrinket.setAttribute("class", "tabcontent");
+
+
+
+    document.getElementById("defaultOpen").click();
+
+    
+/*
+    var btn = document.createElement("BUTTON");
+    var t = document.createTextNode("CLICK ME");
+    btn.appendChild(t);
+    document.body.appendChild(btn);
+
+*/
     var options = {
         chart: {
             renderTo: 'container',
@@ -30,7 +82,8 @@ $(function () {
                 stacking: 'normal',
                 dataLabels: {
                     align: 'right',
-                    enabled: false
+                    enabled: false,
+                    pointFormat: "Value: {point.y:,.0f} mm"
                 },
                 enableMouseTracking: true,
                 pointWidth: 15,
@@ -68,10 +121,10 @@ $(function () {
         },
         tooltip: {
             useHTML: true,
-            //headerFormat: '<span style="font-size: 14px"><b>{point.key}</b></span><br/>',
-            //pointFormat: '<span style=color: "{point.color}"><b>{series.name}</b></span>: <b>{point.y}</b><br/>',
+            headerFormat: '<span style="font-size: 14px"><b>{point.key}</b></span><br/>',
+            pointFormat: '<span style=color: "{point.color}"><b>{series.name}</b></span>: <b>{point.y}</b><br/>',
             padding: 5,
-            shared: true
+            //shared: true
             
             /*
             formatter: function() {
@@ -125,10 +178,6 @@ $(function () {
     }
     
     
-
-standard_chart = Highcharts.chart('container', options);
-
-
 const font_size = "1.1rem";
 
 //Commented out for now until I can decide on colors.
@@ -157,75 +206,79 @@ const ilevel_color_table = {
 "400": "#2ecc71",
 */
 };
-
-
-$.getJSON("https://raw.githubusercontent.com/WarcraftPriests/bfa-shadow-priest/master/json_Charts/trinkets_DA_ST.json", function(data) {
-    //console.log(data); // this will show the info it in firebug console
-//$.getJSON("https://rawgit.com/WarcraftPriests/bfa-shadow-priest/master/json_Charts/traits_DA_C.json", function(data) {
-    sortedItems = [];
-    dpsSortedData = data["sorted_data_keys"];
-    standard_chart.update({
-        xAxis: {
-            categories: dpsSortedData,
-        }
-    });
-    itemLevels = data["simulated_steps"];
-    for (currIlevel of itemLevels)
-        {
-            let maxItemLevel = data["simulated_steps"][0];
-            let itemLevelDpsValues = [];
-            for(sortedData of dpsSortedData)
-                {
-                    var keys = [];
-                    for(var k in data["data"][sortedData]) keys.push(k); //Pull all item levels of the trinket.
-                    let minItemLevel = keys[0];
-                    
-                    console.log(minItemLevel);
-                    sortedData = sortedData.trim();
-                    
-                    let dps = data["data"][sortedData][currIlevel];
-                    let baselineDPS = data["data"]["Base"]["300"];
-                    
-                    //Check to make sure DPS isn't 0
-                    if(dps > 0) 
-                        {
+standard_chart = Highcharts.chart('container', options); // Empty chart.
+function createTrinketChart(jsonFile, simType){
+    $.getJSON("https://raw.githubusercontent.com/WarcraftPriests/bfa-shadow-priest/master/json_Charts/trinkets_DA_ST.json", function(data) {
+        //console.log(data); // this will show the info it in firebug console
+    //$.getJSON("https://rawgit.com/WarcraftPriests/bfa-shadow-priest/master/json_Charts/traits_DA_C.json", function(data) {
+        sortedItems = [];
+        dpsSortedData = data["sorted_data_keys"];
+        standard_chart.update({
+            xAxis: {
+                categories: dpsSortedData,
+            }
+        });
+        itemLevels = data["simulated_steps"];
+        for (currIlevel of itemLevels)
+            {
+                let maxItemLevel = data["simulated_steps"][0];
+                let itemLevelDpsValues = [];
+                for(sortedData of dpsSortedData)
+                    {
+                        var keys = [];
+                        for(var k in data["data"][sortedData]) keys.push(k); //Pull all item levels of the trinket.
+                        let minItemLevel = keys[0];
                         
-                        if(currIlevel == minItemLevel) 
+                        sortedData = sortedData.trim();
+                        
+                        let dps = data["data"][sortedData][currIlevel];
+                        let baselineDPS = data["data"]["Base"]["300"];
+                        
+                        //Check to make sure DPS isn't 0
+                        if(dps > 0) 
                             {
-                                //If lowest ilvl is looked at, subtract base DPS
-                                itemLevelDpsValues.push(dps - baselineDPS);
+                            
+                            if(currIlevel == minItemLevel) 
+                                {
+                                    //If lowest ilvl is looked at, subtract base DPS
+                                    itemLevelDpsValues.push(dps - baselineDPS);
+                                }
+                            else 
+                            {
+                                itemLevelDpsValues.push(dps - data["data"][sortedData][currIlevel - 5]);
                             }
-                        else 
-                        {
-                            itemLevelDpsValues.push(dps - data["data"][sortedData][currIlevel - 5]);
                         }
+                        else 
+                            {
+                            if (currIlevel in data["data"][sortedData]) 
+                                {
+                                itemLevelDpsValues.push(dps);
+                                } 
+                            else 
+                                {
+                                itemLevelDpsValues.push(0);
+                                }
+                            }
+                        
                     }
-                    else 
-                        {
-                        if (currIlevel in data["data"][sortedData]) 
-                            {
-                            itemLevelDpsValues.push(dps);
-                            } 
-                        else 
-                            {
-                            itemLevelDpsValues.push(0);
-                            }
-                        }
-                    
-                }
-            //standard_chart.yAxis[0].update({categories: dpsSortedData});
-            standard_chart.addSeries({
-                color: ilevel_color_table[currIlevel],
-                data: itemLevelDpsValues,
-                name: currIlevel,
-                showInLegend: true
-            }, false);
-            console.log()
-        }
-    document.getElementById('container').style.height = 200 + dpsSortedData.length * 30 + "px";
-    standard_chart.setSize(document.getElementById('container').style.width, document.getElementById('container').style.height);
-    standard_chart.redraw();
-}).fail(function(){
-    console.log("The JSON chart failed to load, please let DJ know via discord Djriff#0001");
-})
+                //standard_chart.yAxis[0].update({categories: dpsSortedData});
+                
+                standard_chart.addSeries({
+                    color: ilevel_color_table[currIlevel],
+                    data: itemLevelDpsValues,
+                    name: currIlevel,
+                    showInLegend: true
+                }, false);
+            }
+        document.getElementById(simType).style.height = 200 + dpsSortedData.length * 30 + "px";
+        standard_chart.setSize(document.getElementById(simType).style.width, document.getElementById(simType).style.height);
+        //standard_chart.renderTo(simType);
+        standard_chart.redraw();
+    }).fail(function(){
+        console.log("The JSON chart failed to load, please let DJ know via discord Djriff#0001");
+    })
+};
+createTrinketChart("https://raw.githubusercontent.com/WarcraftPriests/bfa-shadow-priest/master/json_Charts/trinkets_DA_ST.json", "container")
+
+//standard_chart.destroy();
 });
