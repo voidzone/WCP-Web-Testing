@@ -68,10 +68,10 @@ $(function () {
         },
         tooltip: {
             useHTML: true,
-            headerFormat: '<span style="font-size: 14px"><b>{point.key}</b></span><br/>',
-            pointFormat: '<span style=color: "{point.color}"><b>{series.name}</b></span>: <b>{point.y}</b><br/>',
+            //headerFormat: '<span style="font-size: 14px"><b>{point.key}</b></span><br/>',
+            //pointFormat: '<span style=color: "{point.color}"><b>{series.name}</b></span>: <b>{point.y}</b><br/>',
             padding: 5,
-            split: true
+            shared: true
             
             /*
             formatter: function() {
