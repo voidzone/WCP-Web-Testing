@@ -116,20 +116,23 @@ var WCP_Chart = function WCP_Chart(id, options) {
     };
 };
  
-WCP_Chart.prototype.init = function(type) {
+WCP_Chart.prototype.init = function() {
     // Setup your dummy charts, tabs, initiate the inial chart
     this.chart = Highcharts.chart(this.chartId, this.chartOptions); // Empty chart.
     if (this.options.charts[0].type == 'trinket'){
         this.updateTrinketChart(Object.keys(this.options.charts)[0]); // Setup the initial chart
-    }
-    elif (this.options.charts[0].type == 'azerite-trat'){
+    } else if (this.options.charts[0].type == 'azerite-trat') {
         this.updateTraitChart(Object.keys(this.options.charts)[0]); // Setup the initial chart
     }
-}
+    else {
+        console.log(this.options.carts[0].type,'is an invalid type');
+        return;
+    }
+};
 
  
-WCP_Chart.prototype.updateChart = function(simType) {
-    $.getJSON(this.options.charts[simType], function(data) {
+WCP_Chart.prototype.updateTrinketChart = function(simType) {
+    JQuery.getJSON(this.options.charts[simType], function(data) {
         //console.log(data); 
         var sortedItems = [];
         var dpsSortedData = data["sorted_data_keys"];
@@ -198,6 +201,71 @@ WCP_Chart.prototype.updateChart = function(simType) {
         console.log("The JSON chart failed to load, please let DJ know via discord Djriff#0001");
     })
 };
+
+WCP_Chart.prototype.updateTraitChart = function(simType) {
+    JQuery.getJSON("https://rawgit.com/WarcraftPriests/bfa-shadow-priest/master/json_Charts/traits_"+ this.chart.src + ".json", function(data) {
+        let sortedItems = [];
+        let dpsSortedData = data["sorted_data_keys"];
+        standard_chart.update({
+            xAxis: {
+                categories: dpsSortedData,
+            }
+        });
+        for (let stackCount of [3,2,1])
+            {
+                let maxItemLevel = data["simulated_steps"][0].split("_")[1];
+                let stackName = stackCount + "_" + maxItemLevel;
+                let itemLevelDpsValues = [];
+                for(sortedData of dpsSortedData)
+                    {
+                        sortedData = sortedData.trim();
+                        
+                        let dps = data["data"][sortedData][stackName];
+                        let baselineDPS = data["data"]["Base"]["1_"+maxItemLevel];
+                        
+                        //Check to make sure DPS isn't 0
+                        if(dps > 0) 
+                            {
+                            
+                            if(stackCount == 1) 
+                                {
+                                    //If lowest ilvl is looked at, subtract base DPS
+                                    itemLevelDpsValues.push(dps - baselineDPS);
+                                }
+                            else 
+                            {
+                                itemLevelDpsValues.push(dps - data["data"][sortedData][stackCount - 1 + "_" + maxItemLevel]);
+                            }
+                        }
+                        else 
+                            {
+                            if (stackName in data["data"][sortedData]) 
+                                {
+                            itemLevelDpsValues.push(dps);
+                                } 
+                            else 
+                                {
+                            itemLevelDpsValues.push(0);
+                                }
+                            }
+                        
+                    }
+                let newStackName = stackName.split("_")[0];
+                //standard_chart.yAxis[0].update({categories: dpsSortedData});
+                this.chart.addSeries({
+                    color: ilevel_color_table[stackName],
+                    data: itemLevelDpsValues,
+                    name: newStackName,
+                    showInLegend: true
+                }, false);
+            }
+            document.getElementById(simType).style.height = 200 + dpsSortedData.length * 30 + "px";
+            this.chart.setSize(document.getElementById(simType).style.width, document.getElementById(simType).style.height);
+            this.chart.redraw();
+        }).fail(function(){
+            console.log("The JSON chart failed to load, please let DJ know via discord Djriff#0001");
+        })
+    };
 
 var wcp_chart_1 = new WCP_Chart('chart_div', {
     charts : {
