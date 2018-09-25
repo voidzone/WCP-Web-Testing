@@ -131,17 +131,23 @@ WCP_Chart.prototype.init = function() {
 };
 
  
-WCP_Chart.prototype.updateTrinketChart = function(simType) {
-    JQuery.getJSON(this.options.charts[simType], function(data) {
-        //console.log(data); 
+WCP_Chart.prototype.updateTrinketChart = function(chartName) {
+    JQuery.getJSON("https://rawgit.com/WarcraftPriests/bfa-shadow-priest/master/json_Charts/traits_"+ this.options.charts[chartName].src + ".json" , function(data) {
         var sortedItems = [];
         var dpsSortedData = data["sorted_data_keys"];
         this.chart.update({
             xAxis: {
                 categories: dpsSortedData,
-            }
+            },
+            title: {
+                style: {
+                    color: default_font_color,
+                    fontWeight: 'bold'
+                    },
+                text: this.options.charts[chartName].title
+                }
         });
-        itemLevels = data["simulated_steps"];
+        let itemLevels = data["simulated_steps"];
         for (currIlevel of itemLevels)
             {
                 let maxItemLevel = data["simulated_steps"][0];
@@ -193,8 +199,8 @@ WCP_Chart.prototype.updateTrinketChart = function(simType) {
                     showInLegend: true
                 }, false);
             }
-        document.getElementById(simType).style.height = 200 + dpsSortedData.length * 30 + "px";
-        this.chart.setSize(document.getElementById(simType).style.width, document.getElementById(simType).style.height);
+        document.getElementById(chartName).style.height = 200 + dpsSortedData.length * 30 + "px";
+        this.chart.setSize(document.getElementById(chartName).style.width, document.getElementById(chartName).style.height);
         //this.chart.renderTo(simType);
         this.chart.redraw();
     }).fail(function(){
@@ -202,14 +208,21 @@ WCP_Chart.prototype.updateTrinketChart = function(simType) {
     })
 };
 
-WCP_Chart.prototype.updateTraitChart = function(simType) {
-    JQuery.getJSON("https://rawgit.com/WarcraftPriests/bfa-shadow-priest/master/json_Charts/traits_"+ this.chart.src + ".json", function(data) {
+WCP_Chart.prototype.updateTraitChart = function(chartName) {
+    JQuery.getJSON("https://rawgit.com/WarcraftPriests/bfa-shadow-priest/master/json_Charts/traits_"+ this.options.charts[chartName].src + ".json", function(data) {
         let sortedItems = [];
         let dpsSortedData = data["sorted_data_keys"];
-        standard_chart.update({
+        this.chart.update({
             xAxis: {
                 categories: dpsSortedData,
-            }
+            },
+            title: {
+                style: {
+                    color: default_font_color,
+                    fontWeight: 'bold'
+                    },
+                text: this.options.charts[chartName].title
+                }
         });
         for (let stackCount of [3,2,1])
             {
@@ -259,18 +272,29 @@ WCP_Chart.prototype.updateTraitChart = function(simType) {
                     showInLegend: true
                 }, false);
             }
-            document.getElementById(simType).style.height = 200 + dpsSortedData.length * 30 + "px";
-            this.chart.setSize(document.getElementById(simType).style.width, document.getElementById(simType).style.height);
+            document.getElementById(chartName).style.height = 200 + dpsSortedData.length * 30 + "px";
+            this.chart.setSize(document.getElementById(chartName).style.width, document.getElementById(chartName).style.height);
             this.chart.redraw();
         }).fail(function(){
             console.log("The JSON chart failed to load, please let DJ know via discord Djriff#0001");
         })
     };
 
-var wcp_chart_1 = new WCP_Chart('chart_div', {
+var wcp_charts = new WCP_Chart('chart_div', {
     charts : {
-    'DATrinketsC' : { type: 'trinket', src: 'json_url' },
-    'DATrinketsST' : { type: 'trinket', src: 'json_url'},
-    'DATrinketsD'  : { type: 'trinket', src: 'json_url'},
+    //Trinkets
+    'DATrinketsC' : { type: 'trinket', src: 'Trinkets_DA_C', title: 'Trinkets - Dark Ascension - Composite' },
+    'DATrinketsST' : { type: 'trinket', src: 'Trinkets_DA_ST', title: 'Trinkets - Dark Ascension - Single Target'},
+    'DATrinketsD'  : { type: 'trinket', src: 'Trinkets_DA_D', title: 'Trinkets - Dark Ascension - Dungeon'},
+    'LotVTrinketsC' : { type: 'trinket', src: 'Trinkets_LotV_C', title: 'Trinkets - Legacy of the Void - Composite' },
+    'LotVTrinketsST' : { type: 'trinket', src: 'Trinkets_LotV_ST', title: 'Trinkets - Legacy of the Void - Single Target'},
+    'LotVTrinketsD'  : { type: 'trinket', src: 'Trinkets_LotV_D', title: 'Trinkets - Legacy of the Void - Dungeon'},
+    //Traits
+    'DATrinketsC' : { type: 'trait', src: 'Traits_DA_C', title: 'Azerite Traits - Dark Ascension - Composite' },
+    'DATrinketsST' : { type: 'trait', src: 'Traits_DA_ST', title: 'Azerite Traits - Dark Ascension - Single Target'},
+    'DATrinketsD'  : { type: 'trait', src: 'Traits_DA_D', title: 'Azerite Traits - Dark Ascension - Dungeon'},
+    'LotVTrinketsC' : { type: 'trait', src: 'Traits_LotV_C', title: 'Azerite Traits - Legacy of the Void - Composite' },
+    'LotVTrinketsST' : { type: 'trait', src: 'Traits_LotV_ST', title: 'Azerite Traits - Legacy of the Void - Single Target'},
+    'LotVTrinketsD'  : { type: 'trait', src: 'Traits_LotV_D', title: 'Azerite Traits - Legacy of the Void - Dungeon'},
     }
     });
