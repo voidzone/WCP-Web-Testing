@@ -297,4 +297,83 @@ var wcp_charts = new WCP_Chart('chart_div', {
     'LotVTrinketsST' : { type: 'trait', src: 'Traits_LotV_ST', title: 'Azerite Traits - Legacy of the Void - Single Target'},
     'LotVTrinketsD'  : { type: 'trait', src: 'Traits_LotV_D', title: 'Azerite Traits - Legacy of the Void - Dungeon'},
     }
-    });
+});
+
+
+
+
+var tabClicked = function(event) {
+    var chartName = event.target;
+    if (this.options.charts[chartName].type == 'trinket'){
+            this.updateTrinketChart(chartName); // Setup the initial chart
+        } else if (this.options.charts[chartName].type == 'azerite-trat') {
+            this.updateTraitChart(chartName); // Setup the initial chart
+    }
+};
+    
+var buttons = document.querySelector(this.chartId + '_tabs > button');
+buttons.addEventListener('click', tabClicked);
+
+
+//Create all the HTML for the elements for the charts.
+//Main Div
+var chartDiv = document.createElement("div");
+chartDiv.setAttribute("id", "chart-div");
+chartDiv.setAttribute("class","tab");
+//Talent Buttons
+//DA
+var DABtn = document.createElement("BUTTON");
+DABtn.setAttribute("id", "defaultOpen");
+var DAText = document.createTextNode("Dark Ascension");
+DABtn.appendChild(DAText);
+document.body.appendChild(chartDiv);
+chartDiv.appendChild(DABtn)
+
+
+
+
+//DA div's
+var DATrinket = document.createElement("div");
+DATrinket.setAttribute("id", "DA-Trinket-div");
+DATrinket.setAttribute("class", "tabcontent");
+var DATraits = document.createElement("div");
+DATraits.setAttribute("id", "DA-Trait-div");
+DATraits.setAttribute("class", "tabcontent");
+
+//LotV div's
+var LotVTrinket = document.createElement("div");
+LotVTrinket.setAttribute("id", "LotV-Trinket-div");
+LotVTrinket.setAttribute("class", "tabcontent");
+var LotVTraits = document.createElement("div");
+LotVTraits.setAttribute("id", "LotV-Trait-div");
+LotVTraits.setAttribute("class", "tabcontent");
+
+
+
+
+document.getElementById("defaultOpen").click();
+
+/*
+<!-- Tab links -->
+<div class="tab">
+  <button class="tablinks" onclick="openCity(event, 'London')">London</button>
+  <button class="tablinks" onclick="openCity(event, 'Paris')">Paris</button>
+  <button class="tablinks" onclick="openCity(event, 'Tokyo')">Tokyo</button>
+</div>
+
+<!-- Tab content -->
+<div id="London" class="tabcontent">
+  <h3>London</h3>
+  <p>London is the capital city of England.</p>
+</div>
+
+<div id="Paris" class="tabcontent">
+  <h3>Paris</h3>
+  <p>Paris is the capital of France.</p> 
+</div>
+
+<div id="Tokyo" class="tabcontent">
+  <h3>Tokyo</h3>
+  <p>Tokyo is the capital of Japan.</p>
+</div>
+*/
