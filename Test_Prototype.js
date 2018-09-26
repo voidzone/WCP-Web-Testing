@@ -6,6 +6,33 @@ const light_color = "#eeeeee";
 const medium_color = "#999999";
 const dark_color = "#343a40";
 
+//Commented out for now until I can decide on colors.
+const ilevel_color_table = {
+/*
+"300": "#1abc9c", 
+"305": "#000000", 
+"310": "#3498db", 
+"315": "#9b59b6", 
+"320": "#34495e", 
+"325": "#f1c40f",
+"330": "#e67e22",
+"335": "#e74c3c",
+"340": "#ecf0f1",
+"345": "#95a5a6",
+"350": "#16a085",
+"355": "#27ae60",
+"360": "#2980b9",
+"365": "#8e44ad",
+"370": "#2c3e50",
+"375": "#f39c12",
+"380": "#d35400",
+"385": "#c0392b",
+"390": "#bdc3c7",
+"395": "#7f8c8d",
+"400": "#2ecc71",
+*/
+};
+
 
 var WCP_Chart = function WCP_Chart(id, options) {
     this.chartId = id;
