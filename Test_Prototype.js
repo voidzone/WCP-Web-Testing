@@ -155,10 +155,11 @@ var WCP_Chart = function WCP_Chart(id, options) {
 WCP_Chart.prototype.init = function() {
     // Setup your dummy charts, tabs, initiate the inial chart
     this.chart = Highcharts.chart(this.chartId, this.chartOptions); // Empty chart.
-	if (this.options.charts[Object.keys(this.options.charts)[0]].type == 'trinket'){
-        this.updateTrinketChart(Object.keys(this.options.charts)[0]); // Setup the initial chart
-    } else if (this.options.charts[Object.keys(this.options.charts)[0]].type == 'azerite-trait') {
-        this.updateTraitChart(Object.keys(this.options.charts)[0]); // Setup the initial chart
+	var first = Object.keys(this.options.charts)[0];
+	if (this.options.charts[first].type == 'trinket'){
+        this.updateTrinketChart(first); // Setup the initial chart
+    } else if (this.options.charts[first].type == 'azerite-trait') {
+        this.updateTraitChart(first); // Setup the initial chart
     }
     else {
         console.log(this.options.carts[0].type,'is an invalid type');
