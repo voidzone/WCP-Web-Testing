@@ -1,3 +1,12 @@
+const default_background_color = "#343a40";
+const default_font_color = "#f8f9fa";
+const default_axis_color = "#828282";
+
+const light_color = "#eeeeee";
+const medium_color = "#999999";
+const dark_color = "#343a40";
+
+
 var WCP_Chart = function WCP_Chart(id, options) {
     this.chartId = id;
     this.options = options;
@@ -121,7 +130,7 @@ WCP_Chart.prototype.init = function() {
     this.chart = Highcharts.chart(this.chartId, this.chartOptions); // Empty chart.
     if (this.options.charts[0].type == 'trinket'){
         this.updateTrinketChart(Object.keys(this.options.charts)[0]); // Setup the initial chart
-    } else if (this.options.charts[0].type == 'azerite-trat') {
+    } else if (this.options.charts[0].type == 'azerite-trait') {
         this.updateTraitChart(Object.keys(this.options.charts)[0]); // Setup the initial chart
     }
     else {
@@ -132,7 +141,7 @@ WCP_Chart.prototype.init = function() {
 
  
 WCP_Chart.prototype.updateTrinketChart = function(chartName) {
-    JQuery.getJSON("https://rawgit.com/WarcraftPriests/bfa-shadow-priest/master/json_Charts/traits_"+ this.options.charts[chartName].src + ".json" , function(data) {
+    JQuery.getJSON("https://rawgit.com/WarcraftPriests/bfa-shadow-priest/master/json_Charts/trinket_"+ this.options.charts[chartName].src + ".json" , function(data) {
         var sortedItems = [];
         var dpsSortedData = data["sorted_data_keys"];
         this.chart.update({
@@ -202,6 +211,7 @@ WCP_Chart.prototype.updateTrinketChart = function(chartName) {
         document.getElementById(chartName).style.height = 200 + dpsSortedData.length * 30 + "px";
         this.chart.setSize(document.getElementById(chartName).style.width, document.getElementById(chartName).style.height);
         //this.chart.renderTo(simType);
+        this.chart.renderTo(chartName);
         this.chart.redraw();
     }).fail(function(){
         console.log("The JSON chart failed to load, please let DJ know via discord Djriff#0001");
@@ -274,13 +284,14 @@ WCP_Chart.prototype.updateTraitChart = function(chartName) {
             }
             document.getElementById(chartName).style.height = 200 + dpsSortedData.length * 30 + "px";
             this.chart.setSize(document.getElementById(chartName).style.width, document.getElementById(chartName).style.height);
+            this.chart.renderTo(chartName);
             this.chart.redraw();
         }).fail(function(){
             console.log("The JSON chart failed to load, please let DJ know via discord Djriff#0001");
         })
     };
 
-var wcp_charts = new WCP_Chart('chart_div', {
+var wcp_charts = new WCP_Chart('Chart-Display-div', {
     charts : {
     //Trinkets
     'DATrinketsC' : { type: 'trinket', src: 'Trinkets_DA_C', title: 'Trinkets - Dark Ascension - Composite' },
@@ -290,15 +301,14 @@ var wcp_charts = new WCP_Chart('chart_div', {
     'LotVTrinketsST' : { type: 'trinket', src: 'Trinkets_LotV_ST', title: 'Trinkets - Legacy of the Void - Single Target'},
     'LotVTrinketsD'  : { type: 'trinket', src: 'Trinkets_LotV_D', title: 'Trinkets - Legacy of the Void - Dungeon'},
     //Traits
-    'DATrinketsC' : { type: 'trait', src: 'Traits_DA_C', title: 'Azerite Traits - Dark Ascension - Composite' },
-    'DATrinketsST' : { type: 'trait', src: 'Traits_DA_ST', title: 'Azerite Traits - Dark Ascension - Single Target'},
-    'DATrinketsD'  : { type: 'trait', src: 'Traits_DA_D', title: 'Azerite Traits - Dark Ascension - Dungeon'},
-    'LotVTrinketsC' : { type: 'trait', src: 'Traits_LotV_C', title: 'Azerite Traits - Legacy of the Void - Composite' },
-    'LotVTrinketsST' : { type: 'trait', src: 'Traits_LotV_ST', title: 'Azerite Traits - Legacy of the Void - Single Target'},
-    'LotVTrinketsD'  : { type: 'trait', src: 'Traits_LotV_D', title: 'Azerite Traits - Legacy of the Void - Dungeon'},
+    'DATraitsC' : { type: 'trait', src: 'Traits_DA_C', title: 'Azerite Traits - Dark Ascension - Composite' },
+    'DATraitsST' : { type: 'trait', src: 'Traits_DA_ST', title: 'Azerite Traits - Dark Ascension - Single Target'},
+    'DATraitsD'  : { type: 'trait', src: 'Traits_DA_D', title: 'Azerite Traits - Dark Ascension - Dungeon'},
+    'LotVTraitsC' : { type: 'trait', src: 'Traits_LotV_C', title: 'Azerite Traits - Legacy of the Void - Composite' },
+    'LotVTraitsST' : { type: 'trait', src: 'Traits_LotV_ST', title: 'Azerite Traits - Legacy of the Void - Single Target'},
+    'LotVTraitsD'  : { type: 'trait', src: 'Traits_LotV_D', title: 'Azerite Traits - Legacy of the Void - Dungeon'},
     }
 });
-
 
 
 
@@ -311,69 +321,173 @@ var tabClicked = function(event) {
     }
 };
     
-var buttons = document.querySelector(this.chartId + '_tabs > button');
-buttons.addEventListener('click', tabClicked);
+//var buttons = document.querySelector(this.chartId + '_tabs > button');
+//buttons.addEventListener('click', tabClicked);
+
+/*
+Button Layout:
+[Dark Ascension][Legacy of the Void] --"talent-div"
+[Trinket][Azerite Trait] --"Trinket-Trait-div"
+[Composite][Single Target][Dungeon] --"Fight-Style-Div"
+*/
 
 
 //Create all the HTML for the elements for the charts.
 //Main Div
-var chartDiv = document.createElement("div");
-chartDiv.setAttribute("id", "chart-div");
-chartDiv.setAttribute("class","tab");
+var talentDiv = document.createElement("div");
+talentDiv.setAttribute("id", "talent-div");
+talentDiv.setAttribute("class","tab");
 //Talent Buttons
 //DA
 var DABtn = document.createElement("BUTTON");
-DABtn.setAttribute("id", "defaultOpen");
+DABtn.setAttribute("id", "DABtn");
 var DAText = document.createTextNode("Dark Ascension");
 DABtn.appendChild(DAText);
+document.body.appendChild(talentDiv);
+talentDiv.appendChild(DABtn)
+//LotV
+var LotVBtn = document.createElement("BUTTON");
+LotVBtn.setAttribute("id", "LotvBtn");
+var LotVText = document.createTextNode("Legacy of the Void");
+LotVBtn.appendChild(LotVText);
+document.body.appendChild(talentDiv);
+talentDiv.appendChild(LotVBtn)
+
+
+//Trinket/Trait div's
+var TrinketTraitDiv = document.createElement("div");
+TrinketTraitDiv.setAttribute("id", "Trinket-Trait-div");
+TrinketTraitDiv.setAttribute("class", "tabcontent");
+document.body.appendChild(TrinketTraitDiv);
+
+//Trinket / Trait Buttons
+//Trinket
+var TrinketBtn = document.createElement("BUTTON");
+TrinketBtn.setAttribute("id", "TrinketBtn");
+var TrinketText = document.createTextNode("Trinket");
+TrinketBtn.appendChild(TrinketText);
+TrinketTraitDiv.appendChild(TrinketBtn)
+//Trait
+var TraitBtn = document.createElement("BUTTON");
+TraitBtn.setAttribute("id", "TraitBtn");
+var TraitText = document.createTextNode("Azerite Trait");
+TraitBtn.appendChild(TraitText);
+TrinketTraitDiv.appendChild(TraitBtn)
+
+
+//Fight Style div's
+var fightStyleDiv = document.createElement("div");
+fightStyleDiv.setAttribute("id", "Fight-Style-div");
+fightStyleDiv.setAttribute("class", "tabcontent");
+document.body.appendChild(fightStyleDiv);
+
+//Fight Style Buttons
+//Composite
+var compositeBtn = document.createElement("BUTTON");
+compositeBtn.setAttribute("id", "CompositeBtn");
+var compositeText = document.createTextNode("Composite");
+compositeBtn.appendChild(compositeText);
+fightStyleDiv.appendChild(compositeBtn)
+//Single Target
+var singleTargetBtn = document.createElement("BUTTON");
+singleTargetBtn.setAttribute("id", "SingletTargetBtn");
+var singleTargetText = document.createTextNode("Single Target");
+singleTargetBtn.appendChild(singleTargetText);
+fightStyleDiv.appendChild(singleTargetBtn)
+//Dungeon
+var dungeonBtn = document.createElement("BUTTON");
+dungeonBtn.setAttribute("id", "DungeonBtn");
+var dungeonText = document.createTextNode("Dungeon");
+dungeonBtn.appendChild(dungeonText);
+fightStyleDiv.appendChild(dungeonBtn)
+
+
+
+function createButton(buttonID){
+    let tempBtn = document.createElement("button");
+    tempBtn.setAttribute("class", "tablinks");
+    tempBtn.setAttribute("onclick", "openChart(event, "+buttonID+")");
+    return tempBtn;
+}
+
+//Trinket Button
+var DATrinketBtn_C = createButton("DA-Trinket-Tab-Composite");
+var DATrinketBtn_ST = createButton("DA-Trinket-Tab-SingleTarget");
+var DATrinketBtn_D = createButton("DA-Trinket-Tab-Dungeon");
+var LotVTrinketBtn_C = createButton("LotV-Trinket-Tab-Composite");
+var LotVTrinketBtn_ST = createButton("LotV-Trinket-Tab-SingleTarget");
+var LotVTrinketBtn_D = createButton("LotV-Trinket-Tab-Dungeon");
+
+//Trait Button
+var DATraitBtn_C = createButton("DA-Trait-Tab-Composite");
+var DATraitBtn_ST = createButton("DA-Trait-Tab-SingleTarget");
+var DATraitBtn_D = createButton("DA-Trait-Tab-Dungeon");
+var LotVTraitBtn_C = createButton("LotV-Trait-Tab-Composite");
+var LotVTraitBtn_ST = createButton("LotV-Trait-Tab-SingleTarget");
+var LotVTraitBtn_D = createButton("LotV-Trait-Tab-Dungeon");
+
+
+//Tab Function
+function createTabs(tabID){
+    let tempTab = document.createElement("div");
+    tempTab.setAttribute("id", tabID);
+    tempTab.setAttribute("class","tabcontent");
+    tempTab.style.display = "block"; //Hide all tabs by default.
+    return tempTab;
+}
+
+//Charts div
+var chartDiv = document.createElement("div");
+chartDiv.setAttribute("id", "Chart-Display-div");
+chartDiv.setAttribute("class", "tabcontent");
 document.body.appendChild(chartDiv);
-chartDiv.appendChild(DABtn)
+
+//Trinket Tabs
+var DATrinketTab_C = createTabs("DA-Trinket-Tab-Composite");
+var DATrinketTab_ST = createTabs("DA-Trinket-Tab-SingleTarget");
+var DATrinketTab_D = createTabs("DA-Trinket-Tab-Dungeon");
+var LotVTrinketTab_C = createTabs("LotV-Trinket-Tab-Composite");
+var LotVTrinketTab_ST = createTabs("LotV-Trinket-Tab-SingleTarget");
+var LotVTrinketTab_D = createTabs("LotV-Trinket-Tab-Dungeon");
+
+//Trait Tabs
+var DATraitTab_C = createTabs("DA-Trait-Tab-Composite");
+var DATraitTab_ST = createTabs("DA-Trait-Tab-SingleTarget");
+var DATraitTab_D = createTabs("DA-Trait-Tab-Dungeon");
+var LotVTraitTab_C = createTabs("LotV-Trait-Tab-Composite");
+var LotVTraitTab_ST = createTabs("LotV-Trait-Tab-SingleTarget");
+var LotVTraitTab_D = createTabs("LotV-Trait-Tab-Dungeon");
+
+var DATrinketsCTest = createTabs("DATrinketsC");
+
+console.log(wcp_charts.options.charts[0])
+var test = wcp_charts.options.charts.DATrinketsC;
+DATrinketsCTest.appendChild(test);
+chartDiv.appendChild(DATrinketsCTest);
+
+var tabClicked = function(event) {
+    var chartName = event.target;
+    if (this.options.charts[chartName].type == 'trinket'){
+            this.updateTrinketChart(chartName); // Setup the initial chart
+        } else if (this.options.charts[chartName].type == 'azerite-trat') {
+            this.updateTraitChart(chartName); // Setup the initial chart
+    }
+};
 
 
 
 
-//DA div's
-var DATrinket = document.createElement("div");
-DATrinket.setAttribute("id", "DA-Trinket-div");
-DATrinket.setAttribute("class", "tabcontent");
-var DATraits = document.createElement("div");
-DATraits.setAttribute("id", "DA-Trait-div");
-DATraits.setAttribute("class", "tabcontent");
+//Show DA Trinekts Composite by Default
+DATrinketTab_C.style.display = "none";
 
-//LotV div's
-var LotVTrinket = document.createElement("div");
-LotVTrinket.setAttribute("id", "LotV-Trinket-div");
-LotVTrinket.setAttribute("class", "tabcontent");
-var LotVTraits = document.createElement("div");
-LotVTraits.setAttribute("id", "LotV-Trait-div");
-LotVTraits.setAttribute("class", "tabcontent");
+
+//Button Clicking
+function openChart() {
+    var x = document.getElementById 
+}
 
 
 
 
-document.getElementById("defaultOpen").click();
+//document.getElementById("defaultOpen").click();
 
-/*
-<!-- Tab links -->
-<div class="tab">
-  <button class="tablinks" onclick="openCity(event, 'London')">London</button>
-  <button class="tablinks" onclick="openCity(event, 'Paris')">Paris</button>
-  <button class="tablinks" onclick="openCity(event, 'Tokyo')">Tokyo</button>
-</div>
-
-<!-- Tab content -->
-<div id="London" class="tabcontent">
-  <h3>London</h3>
-  <p>London is the capital city of England.</p>
-</div>
-
-<div id="Paris" class="tabcontent">
-  <h3>Paris</h3>
-  <p>Paris is the capital of France.</p> 
-</div>
-
-<div id="Tokyo" class="tabcontent">
-  <h3>Tokyo</h3>
-  <p>Tokyo is the capital of Japan.</p>
-</div>
-*/
