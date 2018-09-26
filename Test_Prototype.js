@@ -236,10 +236,10 @@ WCP_Chart.prototype.updateTrinketChart = function(chartName) {
                     showInLegend: true
                 }, false);
             }
-        document.getElementById(chartName).style.height = 200 + dpsSortedData.length * 30 + "px";
-        this.chart.setSize(document.getElementById(chartName).style.width, document.getElementById(chartName).style.height);
+        document.getElementById(this.chartId).style.height = 200 + dpsSortedData.length * 30 + "px";
+        this.chart.setSize(document.getElementById(this.chartId).style.width, document.getElementById(this.chartId).style.height);
         //this.chart.renderTo(simType);
-        this.chart.renderTo(chartName);
+        this.chart.renderTo(this.chartId);
         this.chart.redraw();
     }.bind(this)).fail(function(){
         console.log("The JSON chart failed to load, please let DJ know via discord Djriff#0001");
