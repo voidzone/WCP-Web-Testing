@@ -6,6 +6,33 @@ const light_color = "#eeeeee";
 const medium_color = "#999999";
 const dark_color = "#343a40";
 
+//Commented out for now until I can decide on colors.
+const ilevel_color_table = {
+/*
+"300": "#1abc9c", 
+"305": "#000000", 
+"310": "#3498db", 
+"315": "#9b59b6", 
+"320": "#34495e", 
+"325": "#f1c40f",
+"330": "#e67e22",
+"335": "#e74c3c",
+"340": "#ecf0f1",
+"345": "#95a5a6",
+"350": "#16a085",
+"355": "#27ae60",
+"360": "#2980b9",
+"365": "#8e44ad",
+"370": "#2c3e50",
+"375": "#f39c12",
+"380": "#d35400",
+"385": "#c0392b",
+"390": "#bdc3c7",
+"395": "#7f8c8d",
+"400": "#2ecc71",
+*/
+};
+
 
 var WCP_Chart = function WCP_Chart(id, options) {
     this.chartId = id;
@@ -128,10 +155,11 @@ var WCP_Chart = function WCP_Chart(id, options) {
 WCP_Chart.prototype.init = function() {
     // Setup your dummy charts, tabs, initiate the inial chart
     this.chart = Highcharts.chart(this.chartId, this.chartOptions); // Empty chart.
-    if (this.options.charts[0].type == 'trinket'){
-        this.updateTrinketChart(Object.keys(this.options.charts)[0]); // Setup the initial chart
-    } else if (this.options.charts[0].type == 'azerite-trait') {
-        this.updateTraitChart(Object.keys(this.options.charts)[0]); // Setup the initial chart
+	var first = Object.keys(this.options.charts)[0];
+	if (this.options.charts[first].type == 'trinket'){
+        this.updateTrinketChart(first); // Setup the initial chart
+    } else if (this.options.charts[first].type == 'azerite-trait') {
+        this.updateTraitChart(first); // Setup the initial chart
     }
     else {
         console.log(this.options.carts[0].type,'is an invalid type');
@@ -141,174 +169,154 @@ WCP_Chart.prototype.init = function() {
 
  
 WCP_Chart.prototype.updateTrinketChart = function(chartName) {
-    JQuery.getJSON("https://rawgit.com/WarcraftPriests/bfa-shadow-priest/master/json_Charts/trinket_"+ this.options.charts[chartName].src + ".json" , function(data) {
-        var sortedItems = [];
-        var dpsSortedData = data["sorted_data_keys"];
-        this.chart.update({
-            xAxis: {
-                categories: dpsSortedData,
-            },
-            title: {
-                style: {
-                    color: default_font_color,
-                    fontWeight: 'bold'
-                    },
-                text: this.options.charts[chartName].title
-                }
-        });
-        let itemLevels = data["simulated_steps"];
-        for (currIlevel of itemLevels)
-            {
-                let maxItemLevel = data["simulated_steps"][0];
-                let itemLevelDpsValues = [];
-                for(sortedData of dpsSortedData)
-                    {
-                        var keys = [];
-                        for(var k in data["data"][sortedData]) keys.push(k); //Pull all item levels of the trinket.
-                        let minItemLevel = keys[0];
-                       
-                        sortedData = sortedData.trim();
-                       
-                        let dps = data["data"][sortedData][currIlevel];
-                        let baselineDPS = data["data"]["Base"]["300"];
-                       
-                        //Check to make sure DPS isn't 0
-                        if(dps > 0)
-                            {
-                           
-                            if(currIlevel == minItemLevel)
-                                {
-                                    //If lowest ilvl is looked at, subtract base DPS
-                                    itemLevelDpsValues.push(dps - baselineDPS);
-                                }
-                            else
-                            {
-                                itemLevelDpsValues.push(dps - data["data"][sortedData][currIlevel - 5]);
-                            }
-                        }
-                        else
-                            {
-                            if (currIlevel in data["data"][sortedData])
-                                {
-                                itemLevelDpsValues.push(dps);
-                                }
-                            else
-                                {
-                                itemLevelDpsValues.push(0);
-                                }
-                            }
-                       
-                    }
-                //this.chart.yAxis[0].update({categories: dpsSortedData});
-               
-                this.chart.addSeries({
-                    color: ilevel_color_table[currIlevel],
-                    data: itemLevelDpsValues,
-                    name: currIlevel,
-                    showInLegend: true
-                }, false);
-            }
-        document.getElementById(chartName).style.height = 200 + dpsSortedData.length * 30 + "px";
-        this.chart.setSize(document.getElementById(chartName).style.width, document.getElementById(chartName).style.height);
-        //this.chart.renderTo(simType);
-        this.chart.renderTo(chartName);
-        this.chart.redraw();
-    }).fail(function(){
-        console.log("The JSON chart failed to load, please let DJ know via discord Djriff#0001");
-    })
+	jQuery.getJSON("https://rawgit.com/WarcraftPriests/bfa-shadow-priest/master/json_Charts/"+ this.options.charts[chartName].src + ".json" , function(data) {
+		var sortedItems = [];
+		var dpsSortedData = data["sorted_data_keys"];
+		this.chart.update({
+			xAxis: {
+				categories: dpsSortedData,
+			},
+			title: {
+				style: {
+					color: default_font_color,
+					fontWeight: 'bold'
+					},
+				text: this.options.charts[chartName].title
+				}
+		});
+		let itemLevels = data["simulated_steps"];
+		for (currIlevel of itemLevels)
+			{
+				let maxItemLevel = data["simulated_steps"][0];
+				let itemLevelDpsValues = [];
+				for(sortedData of dpsSortedData)
+					{
+						var keys = [];
+						for(var k in data["data"][sortedData]) keys.push(k); //Pull all item levels of the trinket.
+						let minItemLevel = keys[0];
+					   
+						sortedData = sortedData.trim();
+					   
+						let dps = data["data"][sortedData][currIlevel];
+						let baselineDPS = data["data"]["Base"]["300"];
+					   
+						//Check to make sure DPS isn't 0
+						if(dps > 0)
+							{
+						   
+							if(currIlevel == minItemLevel)
+								{
+									//If lowest ilvl is looked at, subtract base DPS
+									itemLevelDpsValues.push(dps - baselineDPS);
+								}
+							else
+							{
+								itemLevelDpsValues.push(dps - data["data"][sortedData][currIlevel - 5]);
+							}
+						}
+						else
+							{
+							if (currIlevel in data["data"][sortedData])
+								{
+								itemLevelDpsValues.push(dps);
+								}
+							else
+								{
+								itemLevelDpsValues.push(0);
+								}
+							}
+					   
+					}
+				//this.chart.yAxis[0].update({categories: dpsSortedData});
+			   
+				this.chart.addSeries({
+					color: ilevel_color_table[currIlevel],
+					data: itemLevelDpsValues,
+					name: currIlevel,
+					showInLegend: true
+				}, false);
+			}
+		document.getElementById(this.chartId).style.height = 200 + dpsSortedData.length * 30 + "px";
+		this.chart.setSize(document.getElementById(this.chartId).style.width, document.getElementById(this.chartId).style.height);
+		//this.chart.renderTo(this.chartId);
+		this.chart.redraw();
+	}.bind(this)).fail(function(){
+		console.log("The JSON chart failed to load, please let DJ know via discord Djriff#0001");
+	});
 };
 
 WCP_Chart.prototype.updateTraitChart = function(chartName) {
-    JQuery.getJSON("https://rawgit.com/WarcraftPriests/bfa-shadow-priest/master/json_Charts/traits_"+ this.options.charts[chartName].src + ".json", function(data) {
-        let sortedItems = [];
-        let dpsSortedData = data["sorted_data_keys"];
-        this.chart.update({
-            xAxis: {
-                categories: dpsSortedData,
-            },
-            title: {
-                style: {
-                    color: default_font_color,
-                    fontWeight: 'bold'
-                    },
-                text: this.options.charts[chartName].title
-                }
-        });
-        for (let stackCount of [3,2,1])
-            {
-                let maxItemLevel = data["simulated_steps"][0].split("_")[1];
-                let stackName = stackCount + "_" + maxItemLevel;
-                let itemLevelDpsValues = [];
-                for(sortedData of dpsSortedData)
-                    {
-                        sortedData = sortedData.trim();
-                        
-                        let dps = data["data"][sortedData][stackName];
-                        let baselineDPS = data["data"]["Base"]["1_"+maxItemLevel];
-                        
-                        //Check to make sure DPS isn't 0
-                        if(dps > 0) 
-                            {
-                            
-                            if(stackCount == 1) 
-                                {
-                                    //If lowest ilvl is looked at, subtract base DPS
-                                    itemLevelDpsValues.push(dps - baselineDPS);
-                                }
-                            else 
-                            {
-                                itemLevelDpsValues.push(dps - data["data"][sortedData][stackCount - 1 + "_" + maxItemLevel]);
-                            }
-                        }
-                        else 
-                            {
-                            if (stackName in data["data"][sortedData]) 
-                                {
-                            itemLevelDpsValues.push(dps);
-                                } 
-                            else 
-                                {
-                            itemLevelDpsValues.push(0);
-                                }
-                            }
-                        
-                    }
-                let newStackName = stackName.split("_")[0];
-                //standard_chart.yAxis[0].update({categories: dpsSortedData});
-                this.chart.addSeries({
-                    color: ilevel_color_table[stackName],
-                    data: itemLevelDpsValues,
-                    name: newStackName,
-                    showInLegend: true
-                }, false);
-            }
-            document.getElementById(chartName).style.height = 200 + dpsSortedData.length * 30 + "px";
-            this.chart.setSize(document.getElementById(chartName).style.width, document.getElementById(chartName).style.height);
-            this.chart.renderTo(chartName);
-            this.chart.redraw();
-        }).fail(function(){
-            console.log("The JSON chart failed to load, please let DJ know via discord Djriff#0001");
-        })
-    };
-
-var wcp_charts = new WCP_Chart('Chart-Display-div', {
-    charts : {
-    //Trinkets
-    'DATrinketsC' : { type: 'trinket', src: 'Trinkets_DA_C', title: 'Trinkets - Dark Ascension - Composite' },
-    'DATrinketsST' : { type: 'trinket', src: 'Trinkets_DA_ST', title: 'Trinkets - Dark Ascension - Single Target'},
-    'DATrinketsD'  : { type: 'trinket', src: 'Trinkets_DA_D', title: 'Trinkets - Dark Ascension - Dungeon'},
-    'LotVTrinketsC' : { type: 'trinket', src: 'Trinkets_LotV_C', title: 'Trinkets - Legacy of the Void - Composite' },
-    'LotVTrinketsST' : { type: 'trinket', src: 'Trinkets_LotV_ST', title: 'Trinkets - Legacy of the Void - Single Target'},
-    'LotVTrinketsD'  : { type: 'trinket', src: 'Trinkets_LotV_D', title: 'Trinkets - Legacy of the Void - Dungeon'},
-    //Traits
-    'DATraitsC' : { type: 'trait', src: 'Traits_DA_C', title: 'Azerite Traits - Dark Ascension - Composite' },
-    'DATraitsST' : { type: 'trait', src: 'Traits_DA_ST', title: 'Azerite Traits - Dark Ascension - Single Target'},
-    'DATraitsD'  : { type: 'trait', src: 'Traits_DA_D', title: 'Azerite Traits - Dark Ascension - Dungeon'},
-    'LotVTraitsC' : { type: 'trait', src: 'Traits_LotV_C', title: 'Azerite Traits - Legacy of the Void - Composite' },
-    'LotVTraitsST' : { type: 'trait', src: 'Traits_LotV_ST', title: 'Azerite Traits - Legacy of the Void - Single Target'},
-    'LotVTraitsD'  : { type: 'trait', src: 'Traits_LotV_D', title: 'Azerite Traits - Legacy of the Void - Dungeon'},
-    }
-});
+	jQuery.getJSON("https://rawgit.com/WarcraftPriests/bfa-shadow-priest/master/json_Charts/traits_"+ this.options.charts[chartName].src + ".json", function(data) {
+		let sortedItems = [];
+		let dpsSortedData = data["sorted_data_keys"];
+		this.chart.update({
+			xAxis: {
+				categories: dpsSortedData,
+			},
+			title: {
+				style: {
+					color: default_font_color,
+					fontWeight: 'bold'
+					},
+				text: this.options.charts[chartName].title
+				}
+		});
+		for (let stackCount of [3,2,1])
+		{
+			let maxItemLevel = data["simulated_steps"][0].split("_")[1];
+			let stackName = stackCount + "_" + maxItemLevel;
+			let itemLevelDpsValues = [];
+			for(sortedData of dpsSortedData)
+				{
+					sortedData = sortedData.trim();
+					
+					let dps = data["data"][sortedData][stackName];
+					let baselineDPS = data["data"]["Base"]["1_"+maxItemLevel];
+					
+					//Check to make sure DPS isn't 0
+					if(dps > 0) 
+						{
+						
+						if(stackCount == 1) 
+							{
+								//If lowest ilvl is looked at, subtract base DPS
+								itemLevelDpsValues.push(dps - baselineDPS);
+							}
+						else 
+						{
+							itemLevelDpsValues.push(dps - data["data"][sortedData][stackCount - 1 + "_" + maxItemLevel]);
+						}
+					}
+					else 
+						{
+						if (stackName in data["data"][sortedData]) 
+							{
+						itemLevelDpsValues.push(dps);
+							} 
+						else 
+							{
+						itemLevelDpsValues.push(0);
+							}
+						}
+					
+				}
+			let newStackName = stackName.split("_")[0];
+			//standard_chart.yAxis[0].update({categories: dpsSortedData});
+			this.chart.addSeries({
+				color: ilevel_color_table[stackName],
+				data: itemLevelDpsValues,
+				name: newStackName,
+				showInLegend: true
+			}, false);
+		}
+		document.getElementById(this.chartId).style.height = 200 + dpsSortedData.length * 30 + "px";
+		this.chart.setSize(document.getElementById(this.chartId).style.width, document.getElementById(this.chartId).style.height);
+		this.chart.renderTo(this.chartId);
+		this.chart.redraw();
+	}.bind(this)).fail(function(){
+		console.log("The JSON chart failed to load, please let DJ know via discord Djriff#0001");
+	});
+};
 
 
 
@@ -404,10 +412,10 @@ fightStyleDiv.appendChild(dungeonBtn)
 
 
 function createButton(buttonID){
-    let tempBtn = document.createElement("button");
-    tempBtn.setAttribute("class", "tablinks");
-    tempBtn.setAttribute("onclick", "openChart(event, "+buttonID+")");
-    return tempBtn;
+	let tempBtn = document.createElement("button");
+	tempBtn.setAttribute("class", "tablinks");
+	tempBtn.setAttribute("onclick", "openChart(event, "+buttonID+")");
+	return tempBtn;
 }
 
 //Trinket Button
@@ -429,11 +437,11 @@ var LotVTraitBtn_D = createButton("LotV-Trait-Tab-Dungeon");
 
 //Tab Function
 function createTabs(tabID){
-    let tempTab = document.createElement("div");
-    tempTab.setAttribute("id", tabID);
-    tempTab.setAttribute("class","tabcontent");
-    tempTab.style.display = "block"; //Hide all tabs by default.
-    return tempTab;
+	let tempTab = document.createElement("div");
+	tempTab.setAttribute("id", tabID);
+	tempTab.setAttribute("class","tabcontent");
+	tempTab.style.display = "block"; //Hide all tabs by default.
+	return tempTab;
 }
 
 //Charts div
@@ -459,11 +467,6 @@ var LotVTraitTab_ST = createTabs("LotV-Trait-Tab-SingleTarget");
 var LotVTraitTab_D = createTabs("LotV-Trait-Tab-Dungeon");
 
 var DATrinketsCTest = createTabs("DATrinketsC");
-
-console.log(wcp_charts.options.charts[0])
-var test = wcp_charts.options.charts.DATrinketsC;
-DATrinketsCTest.appendChild(test);
-chartDiv.appendChild(DATrinketsCTest);
 
 var tabClicked = function(event) {
     var chartName = event.target;

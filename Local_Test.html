@@ -8,9 +8,30 @@
 
 <body>
 	<div id="empty"></div>
+	<div id="container"></div>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://code.highcharts.com/highcharts.js"></script>
 	<script type="text/javascript" src="Test_Prototype.js"></script>
-		<div id="container"></div>
+	<script>
+	var wcp_charts = new WCP_Chart('Chart-Display-div', {
+		charts : {
+		//Trinkets
+		'DATrinketsC' : { type: 'trinket', src: 'trinkets_DA_C', title: 'Trinkets - Dark Ascension - Composite' },
+		'DATrinketsST' : { type: 'trinket', src: 'trinkets_DA_ST', title: 'Trinkets - Dark Ascension - Single Target'},
+		'DATrinketsD'  : { type: 'trinket', src: 'trinkets_DA_D', title: 'Trinkets - Dark Ascension - Dungeon'},
+		'LotVTrinketsC' : { type: 'trinket', src: 'trinkets_LotV_C', title: 'Trinkets - Legacy of the Void - Composite' },
+		'LotVTrinketsST' : { type: 'trinket', src: 'trinkets_LotV_ST', title: 'Trinkets - Legacy of the Void - Single Target'},
+		'LotVTrinketsD'  : { type: 'trinket', src: 'trinkets_LotV_D', title: 'Trinkets - Legacy of the Void - Dungeon'},
+		//Traits
+		'DATraitsC' : { type: 'trait', src: 'traits_DA_C', title: 'Azerite Traits - Dark Ascension - Composite' },
+		'DATraitsST' : { type: 'trait', src: 'traits_DA_ST', title: 'Azerite Traits - Dark Ascension - Single Target'},
+		'DATraitsD'  : { type: 'trait', src: 'traits_DA_D', title: 'Azerite Traits - Dark Ascension - Dungeon'},
+		'LotVTraitsC' : { type: 'trait', src: 'traits_LotV_C', title: 'Azerite Traits - Legacy of the Void - Composite' },
+		'LotVTraitsST' : { type: 'trait', src: 'traits_LotV_ST', title: 'Azerite Traits - Legacy of the Void - Single Target'},
+		'LotVTraitsD'  : { type: 'trait', src: 'traits_LotV_D', title: 'Azerite Traits - Legacy of the Void - Dungeon'},
+		}
+	});
+	wcp_charts.init();
+	</script>
 </body>
 </html>
