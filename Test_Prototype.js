@@ -349,6 +349,7 @@ talentDiv.setAttribute("class","tab");
 //DA
 var DABtn = document.createElement("BUTTON");
 DABtn.setAttribute("id", "DABtn");
+DABtn.setAttribute("class", "button");
 var DAText = document.createTextNode("Dark Ascension");
 DABtn.appendChild(DAText);
 document.body.appendChild(talentDiv);
@@ -356,6 +357,7 @@ talentDiv.appendChild(DABtn)
 //LotV
 var LotVBtn = document.createElement("BUTTON");
 LotVBtn.setAttribute("id", "LotvBtn");
+LotVBtn.setAttribute("class", "button");
 var LotVText = document.createTextNode("Legacy of the Void");
 LotVBtn.appendChild(LotVText);
 document.body.appendChild(talentDiv);
@@ -372,12 +374,14 @@ document.body.appendChild(TrinketTraitDiv);
 //Trinket
 var TrinketBtn = document.createElement("BUTTON");
 TrinketBtn.setAttribute("id", "TrinketBtn");
+TrinketBtn.setAttribute("class", "button");
 var TrinketText = document.createTextNode("Trinket");
 TrinketBtn.appendChild(TrinketText);
 TrinketTraitDiv.appendChild(TrinketBtn)
 //Trait
 var TraitBtn = document.createElement("BUTTON");
 TraitBtn.setAttribute("id", "TraitBtn");
+TraitBtn.setAttribute("class", "button");
 var TraitText = document.createTextNode("Azerite Trait");
 TraitBtn.appendChild(TraitText);
 TrinketTraitDiv.appendChild(TraitBtn)
@@ -393,46 +397,57 @@ document.body.appendChild(fightStyleDiv);
 //Composite
 var compositeBtn = document.createElement("BUTTON");
 compositeBtn.setAttribute("id", "CompositeBtn");
+compositeBtn.setAttribute("class", "button");
 var compositeText = document.createTextNode("Composite");
 compositeBtn.appendChild(compositeText);
 fightStyleDiv.appendChild(compositeBtn)
 //Single Target
 var singleTargetBtn = document.createElement("BUTTON");
 singleTargetBtn.setAttribute("id", "SingletTargetBtn");
+singleTargetBtn.setAttribute("class", "button");
 var singleTargetText = document.createTextNode("Single Target");
 singleTargetBtn.appendChild(singleTargetText);
 fightStyleDiv.appendChild(singleTargetBtn)
 //Dungeon
 var dungeonBtn = document.createElement("BUTTON");
 dungeonBtn.setAttribute("id", "DungeonBtn");
+dungeonBtn.setAttribute("class", "button");
 var dungeonText = document.createTextNode("Dungeon");
 dungeonBtn.appendChild(dungeonText);
 fightStyleDiv.appendChild(dungeonBtn)
 
 
+//Array of all the buttons
+//var btnArray = ['DABtn', 'LotvBtn', 'TrinketBtn', 'TraitBtn', 'CompositeBtn', 'SingletTargetBtn', 'DungeonBtn'];
 
-function createButton(buttonID){
-	let tempBtn = document.createElement("button");
-	tempBtn.setAttribute("class", "tablinks");
-	tempBtn.setAttribute("onclick", "openChart(event, "+buttonID+")");
-	return tempBtn;
+var btnTest = document.getElementsByClassName("button");
+
+for(var i = 0;i<btnTest.length;i++){
+	btnTest[i].onclick=function(){
+		alert("button clicked")
+	}
 }
 
-//Trinket Button
-var DATrinketBtn_C = createButton("DA-Trinket-Tab-Composite");
-var DATrinketBtn_ST = createButton("DA-Trinket-Tab-SingleTarget");
-var DATrinketBtn_D = createButton("DA-Trinket-Tab-Dungeon");
-var LotVTrinketBtn_C = createButton("LotV-Trinket-Tab-Composite");
-var LotVTrinketBtn_ST = createButton("LotV-Trinket-Tab-SingleTarget");
-var LotVTrinketBtn_D = createButton("LotV-Trinket-Tab-Dungeon");
 
-//Trait Button
-var DATraitBtn_C = createButton("DA-Trait-Tab-Composite");
-var DATraitBtn_ST = createButton("DA-Trait-Tab-SingleTarget");
-var DATraitBtn_D = createButton("DA-Trait-Tab-Dungeon");
-var LotVTraitBtn_C = createButton("LotV-Trait-Tab-Composite");
-var LotVTraitBtn_ST = createButton("LotV-Trait-Tab-SingleTarget");
-var LotVTraitBtn_D = createButton("LotV-Trait-Tab-Dungeon");
+
+/*
+		//Trinkets
+		'DATrinketsC' : { type: 'trinket', src: 'trinkets_DA_C', title: 'Trinkets - Dark Ascension - Composite' },
+		'DATrinketsST' : { type: 'trinket', src: 'trinkets_DA_ST', title: 'Trinkets - Dark Ascension - Single Target'},
+		'DATrinketsD'  : { type: 'trinket', src: 'trinkets_DA_D', title: 'Trinkets - Dark Ascension - Dungeon'},
+		'LotVTrinketsC' : { type: 'trinket', src: 'trinkets_LotV_C', title: 'Trinkets - Legacy of the Void - Composite' },
+		'LotVTrinketsST' : { type: 'trinket', src: 'trinkets_LotV_ST', title: 'Trinkets - Legacy of the Void - Single Target'},
+		'LotVTrinketsD'  : { type: 'trinket', src: 'trinkets_LotV_D', title: 'Trinkets - Legacy of the Void - Dungeon'},
+		//Traits
+		'DATraitsC' : { type: 'trait', src: 'traits_DA_C', title: 'Azerite Traits - Dark Ascension - Composite' },
+		'DATraitsST' : { type: 'trait', src: 'traits_DA_ST', title: 'Azerite Traits - Dark Ascension - Single Target'},
+		'DATraitsD'  : { type: 'trait', src: 'traits_DA_D', title: 'Azerite Traits - Dark Ascension - Dungeon'},
+		'LotVTraitsC' : { type: 'trait', src: 'traits_LotV_C', title: 'Azerite Traits - Legacy of the Void - Composite' },
+		'LotVTraitsST' : { type: 'trait', src: 'traits_LotV_ST', title: 'Azerite Traits - Legacy of the Void - Single Target'},
+		'LotVTraitsD'  : { type: 'trait', src: 'traits_LotV_D', title: 'Azerite Traits - Legacy of the Void - Dungeon'},
+		}
+*/
+
 
 
 //Tab Function
@@ -492,5 +507,4 @@ function openChart() {
 
 
 
-//document.getElementById("defaultOpen").click();
 
